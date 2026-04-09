@@ -1,0 +1,1707 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Ambush Checking Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #add8e6 0%, #87ceeb 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg,#1a237e 0%, #283593 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .header h3 {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 0;
+            letter-spacing: 1px;
+            color:#FFD700
+        }
+
+        .form-container {
+            padding: 30px;
+            background: #e6f2ff;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #5b9dd9 0%, #4a8ec2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            border: 2px solid #3a7ca5;
+            text-transform: uppercase;
+        }
+
+        tbody tr {
+            transition: background-color 0.3s;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f0f8ff;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:hover {
+            background-color: #d4e9ff;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #b3d9ff;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        td:first-child {
+            font-weight: bold;
+            background-color: #e6f2ff;
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="time"],
+        input[type="date"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #b3d9ff;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Bold text for info fields */
+        .info-field input[type="text"],
+        .info-field select {
+            font-weight: bold;
+        }
+
+        input[type="text"]:focus,
+        input[type="time"]:focus,
+        input[type="date"]:focus,
+        input[type="file"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+        }
+
+        .info-fields {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-field {
+            flex: 0 1 350px;
+        }
+
+        .info-field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 12px;
+        }
+
+        .info-field input {
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .remarks-section {
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .remarks-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 12px;
+        }
+
+        .remarks-section textarea {
+            width: 100%;
+            font-size: 12px;
+            min-height: 60px;
+            border: 1px solid #b3d9ff;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .add-row-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .add-row-btn:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .pdf-btn {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            background: linear-gradient(135deg, #d35400 0%, #ba4a00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .save-draft-btn {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+
+        .save-draft-btn:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .upload-draft-btn {
+            background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+            color: white;
+        }
+
+        .upload-draft-btn:hover {
+            background: linear-gradient(135deg, #138d75 0%, #117a65 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        #draftFileInput {
+            display: none;
+        }
+
+        .message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        /* Voice typing toggle switch */
+        .voice-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: #f0f8ff;
+            border-bottom: 2px solid #b3d9ff;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .voice-toggle-label,
+        .mobile-toggle-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #27ae60;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .voice-status {
+            margin-left: 15px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .voice-active {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .listening-indicator {
+            display: none;
+            margin-left: 10px;
+            color: #e74c3c;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Mobile View Styles */
+        body.mobile-view {
+            padding: 0;
+        }
+
+        body.mobile-view .container {
+            max-width: 100%;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        body.mobile-view .header h1 {
+            font-size: 1.2em;
+            letter-spacing: 1px;
+        }
+
+        body.mobile-view .header h2 {
+            font-size: 0.9em;
+        }
+
+        body.mobile-view .header {
+            padding: 15px 10px;
+        }
+
+        body.mobile-view .voice-toggle-container {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        body.mobile-view .toggle-group {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
+        }
+
+        body.mobile-view .form-container {
+            padding: 15px 10px;
+        }
+
+        body.mobile-view .info-fields {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        body.mobile-view .info-field {
+            flex: 1 1 100%;
+        }
+
+        body.mobile-view table {
+            font-size: 9px;
+        }
+
+        body.mobile-view th,
+        body.mobile-view td {
+            padding: 5px 3px;
+            font-size: 8px;
+        }
+
+        body.mobile-view input[type="text"],
+        body.mobile-view input[type="time"],
+        body.mobile-view input[type="date"],
+        body.mobile-view select,
+        body.mobile-view textarea {
+            font-size: 11px;
+            padding: 6px;
+        }
+
+        /* Zoom overlay container for mobile view */
+        .zoom-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .zoom-overlay.active {
+            display: flex;
+        }
+
+        .zoom-input-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90vw;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .zoom-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        .zoom-input-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .zoom-close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .zoom-close-btn:active {
+            background: #c0392b;
+        }
+
+        .zoom-input {
+            width: 100%;
+            min-height: 120px;
+            font-size: 18px;
+            padding: 15px;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .zoom-input:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .zoom-done-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .zoom-done-btn:active {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+        }
+
+        body.mobile-view .button-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        body.mobile-view button {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 0.85em;
+        }
+
+        body.mobile-view .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+<!-- Code injected by Five-server -->
+  <script async data-id="five-server" data-file="c:\Users\asus\OneDrive\Desktop\ALL FORMS\mobile ambush\index.html" type="application/javascript" src="/fiveserver.js"></script>
+  </head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>WHISTLING AND SIGNAL EXCHNGE AMBUSH</h1>
+            <h3>RAIPUR DIVISION</h3>
+        </div>
+
+        <!-- Toggle Switches Container -->
+        <div class="voice-toggle-container">
+            <div class="toggle-group">
+                <!-- Mobile View Toggle -->
+                <div class="toggle-item">
+                    <span class="mobile-toggle-label">📱 Mobile View:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="mobileToggle" onchange="toggleMobileView()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Voice Typing Toggle -->
+                <div class="toggle-item">
+                    <span class="voice-toggle-label">🎤 Voice Typing:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="voiceToggle" onchange="toggleVoiceTyping()">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="voice-status" id="voiceStatus">OFF</span>
+                    <span class="listening-indicator" id="listeningIndicator">🎤 Listening...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zoom Overlay for Mobile View -->
+        <div class="zoom-overlay" id="zoomOverlay">
+            <div class="zoom-input-container">
+                <div class="zoom-input-header">
+                    <span class="zoom-input-title" id="zoomTitle">Enter Text</span>
+                    <button class="zoom-close-btn" onclick="closeZoomInput()">×</button>
+                </div>
+                <textarea class="zoom-input" id="zoomInput" placeholder="Type or speak here..."></textarea>
+                <button class="zoom-done-btn" onclick="closeZoomInput()">✓ Done</button>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="info-fields" style="margin-bottom: 20px;">
+                <div class="info-field">
+                    <label for="formDate">DATE:</label>
+                    <input type="text" id="formDate">
+                </div>
+                <div class="info-field">
+                    <label for="formTime">TIME:</label>
+                    <input type="text" id="formTime">
+                </div>
+                <div class="info-field">
+                    <label for="formPlace">PLACE:</label>
+                    <input type="text" id="formPlace">
+                </div>
+                <div class="info-field">
+                    <label for="baMachineNo">CONDUCTED BY:</label>
+                    <input type="text" id="baMachineNo">
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">S/No.</th>
+                            <th style="width: 150px;">Loco No.</th>
+                            <th style="width: 120px;">Train NO.</th>
+                            <th style="width: 100px;">Direction</th>
+                            <th style="width: 100px;">Time</th>
+                             <th style="width: 80px;">Signal Exchanged<br></th>
+                            <th style="width: 80px;">Whistling</th>
+                             <th style="width: 150px;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td class="row-number">1</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                             <td><input type="text" value="YES"></td>
+                             <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-number">2</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                           
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                               <td><input type="text"></td>
+                              
+                              
+                        </tr>
+                        <tr>
+                            <td class="row-number">3</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                           
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                               
+                           
+                        </tr>
+                        <tr>
+                            <td class="row-number">4</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                             
+                        
+                        </tr>
+                        <tr>
+                            <td class="row-number">5</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                              
+                          
+                        </tr>
+                        <tr>
+                            <td class="row-number">6</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                             
+                             
+                        </tr>
+                        <tr>
+                            <td class="row-number">7</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                          
+                            
+                        </tr>
+                        <tr>
+                            <td class="row-number">8</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                         
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                               <td><input type="text"></td>
+                                   
+                        </tr>
+                        <tr>
+                            <td class="row-number">9</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                              
+                          
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                            
+                        
+                        </tr>
+                        <tr>
+                            <td class="row-number">10</td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                           
+                            <td><input type="text" value="YES"></td>
+                            <td><input type="text" value="YES"></td>
+                             <td><input type="text"></td>
+                              
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="button-group" style="margin-top: 20px; margin-bottom: 20px;">
+                <button class="add-row-btn" onclick="addRow()">+ Add Row</button>
+            </div>
+
+            <div class="remarks-section">
+                <label for="otherRemarks">Other Remarks if any:</label>
+                <textarea id="otherRemarks" rows="2"></textarea>
+            </div>
+
+            <div class="info-fields">
+                <div class="info-field">
+                    <label for="cliName">CLI Name and HQ:</label>
+                    <select id="cliName">
+                        <option value="">Select CLI Name and HQ</option>
+                        <option value="A K REDDY/CLI/BIA">A K REDDY/CLI/R</option>
+                                <option value="A.R.TARAM/CLI/BIA">A.R. TARAM/CLI/BIA</option>
+                                <option value="ABDUL MOIN KHAN/CLI/BIA">ABDUL MOIN KHAN/CLI/BIA</option>
+                                <option value="AKHILESH KUMAR/CLI/BIA">AKHILESH KUMAR/CLI/BIA</option>
+                                <option value="AMIT KUMAR BANKURE/CLI/BYT">AMIT KUMAR BANKURE/CLI/BYT</option>
+                                <option value="ANANT PRAKASH SHRIVASTAVA/CLI/BIA">ANANT PRAKASH SHRIVASTAVA/CLI/BIA</option>
+                                <option value="ANIL KUMAR/CLI/BIA">ANIL KUMAR/CLI/BIA</option>
+                                <option value="ANKIT RAM KANT/CLI/BIA">ANKIT RAM KANT/CLI/BIA</option>
+                                <option value="AVON KUMAR SAHU/CLI/R">AVON KUMAR SAHU/CLI/R</option>
+                                <option value="ASHISH WANJARI/CLI/BYT">ASHISH WANJARI/CLI/BYT</option>
+                                <option value="B B KUSHWAHA/CLI/BIA">B B KUSHWAHA/CLI/BIA</option>
+                                <option value="B K HARMUKH/CLI/BIA">B K HARMUKH/CLI/BIA</option>
+                                <option value="B. K. SAHA/CLI/BIA">B. K. SAHA/CLI/BIA</option>
+                                <option value="B.K.SONI/CLI/BIA">B.K.SONI/CLI/BIA</option>
+                                <option value="BHARAT SINGH ATBHAIYYA/CLI/R">BHARAT SINGH ATBHAIYYA/CLI/R</option>
+                                <option value="BHOLI CHAUDHARY/CLI/R">BHOLI CHAUDHARY/CLI/R</option>
+                                <option value="BIKRAMJIT KANRAR/CLI/BIA">BIKRAMJIT KANRAR/CLI/BIA</option>
+                                <option value="BINOD KUMAR RAM/CLI/R">BINOD KUMAR RAM/CLI/R</option>
+                                <option value="CLI NAME/CLI/BIA">CLI NAME/CLI/BIA</option>
+                                <option value="DEEPANNITA PUNTAMBEKAR/CLI/BIA">DEEPANNITA PUNTAMBEKAR/CLI/BIA</option>
+                                <option value="DILLI RAO/CLI/BYT">DILLI RAO/CLI/BYT</option>
+                                <option value="G. C. BISWAS/CLI/R">G. C. BISWAS/CLI/R</option>
+                                <option value="G. V. R. K. MADHU/CLI/BIA">G. V. R. K. MADHU/CLI/BIA</option>
+                                <option value="GIRDHARI LAL/CLI/R">GIRDHARI LAL/CLI/R</option>
+                                <option value="JAISHANKAR SHARMA/CLI/BIA">JAISHANKAR SHARMA/CLI/BIA</option>
+                                <option value="JITENDRA KUMAR MISHRA/CLI/BYT">JITENDRA KUMAR MISHRA/CLI/BYT</option>
+                                <option value="K P LAHARE/CLI/R">A.R. TARAM/CLI/BIA</option>
+                                <option value="K P HIRWANI/CLI/BYT">K P HIRWANI/CLI/BYT</option>
+                                <option value="K. K. SAHU/CLI/BIA">K. K. SAHU/CLI/BIA</option>
+                                <option value="KHUSAL SINGH/CLI/DRZ">KHUSAL SINGH/CLI/DRZ</option>
+                                <option value="MAHESHWAR/CLI/BIA">MAHESHWAR/CLI/BIA</option>
+                                <option value="MANOJ KUMAR SAO/CLI/R">MANOJ KUMAR SAO/CLI/R</option>
+                                <option value="MANSUKH LAL CHANDRAKAR/CLI/R">MANSUKH LAL CHANDRAKAR/CLI/R</option>
+                                <option value="MOHIT KUMAR SWARNKAR/CLI/BIA">MOHIT KUMAR SWARNKAR/CLI/BIA</option>
+                                <option value="N. R. KARPAL/CLI/BIA">N. R. KARPAL/CLI/BIA</option>
+                                <option value="N.K. BHOI/CLI/R">N.K. BHOI/CLI/R</option>
+                                <option value="NITIN KUKDE/CLI/BYT">NITIN KUKDE/CLI/BYT</option>
+                                <option value="NIRMAL KUMAR/CLI/BYT">NIRMAL KUMAR/CLI/BYT</option>
+                                <option value="P.K. PATEL/CLI/BIA">P.K. PATEL/CLI/BIA</option>
+                                <option value="PANKAJ KUMAR SINGH/CLI/BIA">PANKAJ KUMAR SINGH/CLI/BIA</option>
+                                <option value="PAWAN KUMAR SINGH/CLI/BIA">PAWAN KUMAR SINGH/CLI/BIA
+                                <option value="PURAN LAL PATEL/CLI/BYT">A.R. TARAM/CLI/BIA</option>
+                                <option value="RAJENDRA KUMAR/CLI/BIA">RAJENDRA KUMAR/CLI/BIA</option>
+                                <option value="PALAK RAM ALENDRA/CLI/DRZ">PALAK RAM ALENDRA/CLI/DRZ</option>
+                                <option value="RAJESH KUMAR DESHMUKH/CLI/R">RAJESH KUMAR DESHMUKH/CLI/R</option>
+                                <option value="RAJNEESH BENERJEE/CLI/BIA">RAJNEESH BENERJEE/CLI/BIA</option>
+                                <option value="RANJEET SINGH/CLI/BYT">RANJEET SINGH/CLI/BYT</option>
+                                <option value="RAKESH KUMAR KOSTA/CLI/DRZ">RAKESH KUMAR KOSTA/CLI/DRZ</option>
+                                <option value="S K GAUTAM/CLI/BIA">S K GAUTAM/CLI/BIA</option>
+                                <option value="S S HUSSAIN/CLI/BIA">S S HUSSAIN/CLI/BIA</option>
+                                <option value="S. C. RAI/CLI/BIA">S. C. RAI/CLI/BIA</option>
+                                <option value="S. K. SINGH/CLI/BIA">S. K. SINGH/CLI/BIA</option>
+                                <option value="S. L. SONI/CLI/R">S. L. SONI/CLI/R</option>
+                                <option value="SANJAY KUMAR ROY/CLI/BIA">SANJAY KUMAR ROY/CLI/BIA</option>
+                                <option value="SANJAY SINGH/CLI/BYT">SANJAY SINGH/CLI/BYT</option>
+                                <option value="SANJEEV KUMAR SHARMA/CLI/BIA">SANJEEV KUMAR SHARMA/CLI/BIA</option>
+                                <option value="SANTOSH KUAMAR PATKAR/CLI/BIA">SANTOSH KUAMAR PATKAR/CLI/BIA</option>
+                                <option value="SHAILENDRA SINGH/CLI/BIA">SHAILENDRA SINGH/CLI/BIA</option>
+                                <option value="SUNDEEP KUMAR SHARMA/CLI/BIA">SUNDEEP KUMAR SHARMA/CLI/BIA</option>
+                                <option value="SUNIL KUMAR DEWANGAN/CLI/BIA">SUNIL KUMAR DEWANGAN/CLI/BIA</option>
+                                <option value="SANAT KUMAR SAHU/CLI/DRZ">SANAT KUMAR SAHU/CLI/DRZ</option>
+                                <option value="TEST ID/CLI/BIA">TEST ID/CLI/BIA</option>
+                                <option value="V.K. BHAGAT/CLI/R">V.K. BHAGAT/CLI/R</option>
+                                <option value="VIJAY KUMAR ARYA/CLI/BIA">VIJAY KUMAR ARYA/CLI/BIA</option>
+                                <option value="VIKAS SHENDE/CLI/BIA">VIKAS SHENDE/CLI/BIA</option>
+                                <option value="VINAY KUMAR VINCHURE/CLI/BIA">VINAY KUMAR VINCHURE/CLI/BIA</option>
+                                <option value="VINAY PANTAWANE/CLI/BIA">VINAY PANTAWANE/CLI/BIA</option>
+                                <option value="Y. RAMU/CLI/BIA">Y. RAMU/CLI/BIA</option>
+                                <option value="YOGESH KUMAR MIHAULIA/CLI/BIA">YOGESH KUMAR MIHAULIA/CLI/BIA</option>
+                                <option value="OTHERS">OTHERS</option>>
+                        <option value="OTHERS">OTHERS</option>
+                    </select>
+                </div>
+                <BR>
+                    <br>
+            
+                <div class="info-field">
+                    <label for="signature">Upload Signature:</label>
+                    <input type="file" id="signature" accept="image/*" onchange="previewSignature(event)">
+                    <div id="signaturePreview" style="margin-top: 10px; display: none;">
+                        <img id="signatureImg" style="max-width: 200px; max-height: 100px; border: 2px solid #4a90e2; border-radius: 5px;">
+                    </div>
+                </div>
+            </div>
+             <div class="info-field">
+                    <label for="signature">Upload Signature:</label>
+                    <input type="file" id="signature" accept="image/*" onchange="previewSignature(event)">
+                    <div id="signaturePreview" style="margin-top: 10px; display: none;">
+                        <img id="signatureImg" style="max-width: 200px; max-height: 100px; border: 2px solid #4a90e2; border-radius: 5px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="save-draft-btn" onclick="saveDraft()">Save Draft</button>
+                <button class="upload-draft-btn" onclick="triggerUploadDraft()">Upload Draft</button>
+                <input type="file" id="draftFileInput" accept=".json" onchange="uploadDraft(event)">
+                <button class="submit-btn" onclick="submitForm()">Submit</button>
+                <button class="pdf-btn" onclick="generatePDF()">Generate PDF</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        // ─────────────────────────────────────────────────────────────────
+        // ✅  APPS SCRIPT CONFIG  –  Paste your deployed Web App URL below
+        // ─────────────────────────────────────────────────────────────────
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzalMDjG3qiihI0aBzbwFT1qyk260pHO0-hfMHZWl7alNlBklZcan2-zEYH6EkHV_vD/exec";
+        // ─────────────────────────────────────────────────────────────────
+
+        let rowCount = 10;
+
+        function previewSignature(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('signaturePreview');
+                    const img = document.getElementById('signatureImg');
+                    img.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addRow() {
+            rowCount++;
+            const tableBody = document.getElementById('tableBody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td class="row-number">${rowCount}</td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+               
+                <td><input type="text" value="YES"></td>
+                <td><input type="text" value="YES"></td>
+                 <td><input type="text"></td>
+            `;
+
+            tableBody.appendChild(newRow);
+            showMessage('Row added successfully!', 'success');
+        }
+
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.row-number').textContent = index + 1;
+            });
+            rowCount = rows.length;
+        }
+
+        function submitForm() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            const data = [];
+            let isValid = true;
+
+            // Get additional form fields
+            const otherRemarks = document.getElementById('otherRemarks').value || '';
+            const formDate = document.getElementById('formDate').value || '';
+            const formTime = document.getElementById('formTime').value || '';
+            const formPlace = document.getElementById('formPlace').value || '';
+            const baMachineNo = document.getElementById('baMachineNo').value || '';
+            const cliNameSelect = document.getElementById('cliName');
+            const cliName = cliNameSelect.options[cliNameSelect.selectedIndex].value || '';
+
+            // Validate required fields
+            if (!formDate) {
+                showMessage('Please select a date!', 'error');
+                return;
+            }
+
+            if (!cliName) {
+                showMessage('Please select CLI Name and HQ!', 'error');
+                return;
+            }
+
+            rows.forEach((row, index) => {
+                const cells = row.querySelectorAll('input, select, textarea');
+                const rowData = {
+                    sno: index + 1,
+                    name: cells[0].value,
+                    crewId: cells[1].value,
+                    designation: cells[2].value,
+                    callLogs: cells[3].value,
+                    mobileStatus: cells[4].value,
+                    callingTime: cells[5].value,
+                    remarks: cells[6].value
+                };
+
+                data.push(rowData);
+            });
+
+            // Prepare payload for Google Apps Script
+            const payload = {
+                formDate: formDate,
+                formTime: formTime,
+                formPlace: formPlace,
+                baMachineNo: baMachineNo,
+                cliName: cliName,
+                otherRemarks: otherRemarks,
+                tableData: data
+            };
+
+            console.log('Submitting Data:', payload);
+            showMessage('Submitting data to Google Sheets...', 'success');
+
+            // Submit to Google Apps Script
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") {
+                showMessage('⚠️ Please set your Apps Script URL in the APPS_SCRIPT_URL constant!', 'error');
+                console.warn('APPS_SCRIPT_URL is not configured.');
+                return;
+            }
+
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                showMessage('Data submitted successfully to Google Sheets!', 'success');
+                console.log('Submission successful!');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                showMessage('Error submitting data. Please try again.', 'error');
+            });
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4'); // Portrait orientation
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            // Get form field values
+            const formDate = document.getElementById('formDate').value || '';
+            const formTime = document.getElementById('formTime').value || '';
+            const formPlace = document.getElementById('formPlace').value || '';
+            const baMachineNo = document.getElementById('baMachineNo').value || '';
+
+            // Add title
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('AMBUSH CHECK OF WHISTLING AND SIGNAL EXCHANGE', pageWidth / 2, 14, { align: 'center' });
+
+            // Add subtitle
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('RAIPUR DIVISON', pageWidth / 2, 21, { align: 'center' });
+
+            // Add full line below Raipur Division
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(74, 144, 226);
+            doc.line(14, 23, pageWidth - 14, 23);
+
+            // ── Info fields just below heading (no borders, plain text) ──
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            let infoY = 35;
+            const col1X = 14;
+            const col2X = pageWidth / 2 + 5;
+
+            // Row 1: Date | Time
+            doc.text('DATE:', col1X, infoY);
+            doc.setFont(undefined, 'bold');
+            doc.text(formDate, col1X + 12, infoY);
+
+            doc.setFont(undefined, 'bold');
+            doc.text('TIME:', col2X, infoY);
+            doc.setFont(undefined, 'bold');
+            doc.text(formTime, col2X + 12, infoY);
+
+            // Row 2: Place | BA Machine No
+            infoY += 6;
+            doc.setFont(undefined, 'bold');
+            doc.text('PLACE:', col1X, infoY);
+            doc.setFont(undefined, 'bold');
+            doc.text(formPlace, col1X + 14, infoY);
+
+            doc.setFont(undefined, 'bold');
+            doc.text('CONDUCTED BY.:', col2X, infoY);
+            doc.setFont(undefined, 'bold');
+            doc.text(baMachineNo, col2X + 36, infoY);
+
+            // Get table data
+            const rows = document.querySelectorAll('#tableBody tr');
+            const tableData = [];
+
+            rows.forEach((row) => {
+                const cells = row.querySelectorAll('input, select, textarea');
+                const rowNumber = row.querySelector('.row-number').textContent;
+
+                tableData.push([
+                    rowNumber,
+                    cells[0].value || '',
+                    cells[1].value || '',
+                    cells[2].value || '',
+                    cells[3].value || '',
+                    cells[4].value || '',
+                    cells[5].value || ''
+                ]);
+            });
+
+            // Generate table
+            doc.autoTable({
+                head: [['S.No.', 'Loco NO', 'Train No.', 'Direction.', 'Time', 'Signal Exchanged', 'whistling','Remarks']],
+                body: tableData,
+                startY: 45,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [74, 144, 226],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    fontSize: 10
+                },
+                styles: {
+                    fontSize: 09,
+                    cellPadding: 2.5,
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { cellWidth: 10 },
+                    1: { cellWidth: 20 },
+                    2: { cellWidth: 25 },
+                    3: { cellWidth: 25 },
+                    4: { cellWidth: 25 },
+                    5: { cellWidth: 16},
+                    6: { cellWidth: 16 },
+                    7: { cellWidth: 35 }
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 248, 255]
+                }
+            });
+
+            // Get the Y position after the table
+            let yPosition = doc.lastAutoTable.finalY + 10;
+
+            // Get Other Remarks
+            const otherRemarks = document.getElementById('otherRemarks').value || '';
+
+            // Add Other Remarks if any with outlined box
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Other Remarks if any:', 14, yPosition);
+
+            // Draw outlined box for Other Remarks
+            const boxHeight = 15;
+            const boxWidth = 180;
+            doc.setDrawColor(255, 255, 255);
+            doc.setLineWidth(0.5);
+            doc.rect(14, yPosition + 2, boxWidth, boxHeight);
+
+            // Add text inside the box
+            if (otherRemarks) {
+                doc.setFont(undefined, 'bold');
+                const splitOtherRemarks = doc.splitTextToSize(otherRemarks, boxWidth - 4);
+                doc.text(splitOtherRemarks, 18, yPosition + 7);
+            }
+
+            yPosition += boxHeight + 18;
+
+            // Get CLI Name and Signature
+            const cliNameSelect = document.getElementById('cliName');
+            const cliName = cliNameSelect.options[cliNameSelect.selectedIndex].value || '';
+            const signatureFile = document.getElementById('signature').files[0];
+
+            // Add Signature if uploaded
+            if (signatureFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgData = e.target.result;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+
+                    // Add signature on the right side
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Signature:', pageWidth - 54, yPosition);
+                    doc.addImage(imgData, 'PNG', pageWidth - 54, yPosition + 2, 40, 15);
+
+                    // Add Date and CLI Name after signature
+                    addDateAndCLI();
+                    saveDocument();
+                };
+                reader.readAsDataURL(signatureFile);
+            } else {
+                // Add Date and CLI Name without signature
+                addDateAndCLI();
+                saveDocument();
+            }
+
+            function addDateAndCLI() {
+                const pgWidth = doc.internal.pageSize.getWidth();
+
+                // If signature was added, move down
+                if (signatureFile) {
+                    yPosition += 20;
+                }
+
+                // CLI Name only (Date/Time/Place/BA Machine shown above table)
+                doc.setFontSize(10);
+                if (cliName) {
+                    doc.setFont(undefined, 'bold');
+                    doc.text(cliName, pgWidth - 14, yPosition, { align: 'right' });
+                }
+            }
+
+            function saveDocument() {
+                // Save PDF
+                const timestamp = new Date().toISOString().split('T')[0];
+                doc.save(`Mobile_Ambush_Checking_${timestamp}.pdf`);
+                showMessage('PDF generated and downloaded successfully!', 'success');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Voice Typing Functionality
+        let recognition;
+        let isVoiceEnabled = false;
+        let currentFocusedElement = null;
+
+        // Check browser support for Speech Recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-IN'; // English (India)
+
+            recognition.onstart = function() {
+                document.getElementById('listeningIndicator').style.display = 'inline';
+            };
+
+            recognition.onend = function() {
+                document.getElementById('listeningIndicator').style.display = 'none';
+                if (isVoiceEnabled) {
+                    // Restart recognition if still enabled
+                    setTimeout(() => {
+                        if (isVoiceEnabled) {
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.log('Recognition restart error:', e);
+                            }
+                        }
+                    }, 100);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'no-speech') {
+                    // Ignore no-speech errors and continue
+                    return;
+                }
+                if (event.error === 'aborted') {
+                    return;
+                }
+                document.getElementById('listeningIndicator').style.display = 'none';
+            };
+
+            let lastProcessedIndex = 0;
+
+            recognition.onresult = function(event) {
+                if (!currentFocusedElement) return;
+
+                let finalTranscript = '';
+
+                // Only process new results to avoid duplication
+                for (let i = lastProcessedIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                        lastProcessedIndex = i + 1;
+                    }
+                }
+
+                if (finalTranscript) {
+                    // Append final transcript to the current value in CAPITAL LETTERS
+                    const currentValue = currentFocusedElement.value || '';
+                    currentFocusedElement.value = currentValue + finalTranscript.toUpperCase();
+                }
+            };
+        }
+
+        function toggleVoiceTyping() {
+            const toggle = document.getElementById('voiceToggle');
+            const status = document.getElementById('voiceStatus');
+            isVoiceEnabled = toggle.checked;
+
+            if (isVoiceEnabled) {
+                if (recognition) {
+                    status.textContent = 'ON';
+                    status.classList.add('voice-active');
+                    showMessage('Voice typing enabled. Click on any text field and start speaking.', 'success');
+                    setupVoiceListeners();
+                } else {
+                    toggle.checked = false;
+                    isVoiceEnabled = false;
+                    showMessage('Voice typing is not supported in your browser. Please use Chrome or Edge.', 'error');
+                }
+            } else {
+                status.textContent = 'OFF';
+                status.classList.remove('voice-active');
+                document.getElementById('listeningIndicator').style.display = 'none';
+                if (recognition) {
+                    recognition.stop();
+                }
+                removeVoiceListeners();
+                showMessage('Voice typing disabled.', 'success');
+            }
+        }
+
+        function setupVoiceListeners() {
+            // Add focus listeners to all text inputs and textareas
+            const inputs = document.querySelectorAll('input[type="text"], textarea:not(.zoom-input)');
+            inputs.forEach(input => {
+                input.addEventListener('focus', handleInputFocus);
+                input.addEventListener('blur', handleInputBlur);
+            });
+        }
+
+        // Add focus listeners for mobile zoom (always active)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delegate event listener for dynamically added rows
+            document.addEventListener('focus', function(event) {
+                const target = event.target;
+                const isTableInput = target.matches('input[type="text"]') && target.closest('td') !== null;
+
+                if (isTableInput && document.body.classList.contains('mobile-view')) {
+                    handleInputFocus(event);
+                }
+            }, true);
+        });
+
+        function removeVoiceListeners() {
+            const inputs = document.querySelectorAll('input[type="text"], textarea');
+            inputs.forEach(input => {
+                input.removeEventListener('focus', handleInputFocus);
+                input.removeEventListener('blur', handleInputBlur);
+            });
+        }
+
+        let originalInputElement = null;
+
+        function handleInputFocus(event) {
+            // Show zoom overlay in mobile view for table inputs
+            if (document.body.classList.contains('mobile-view')) {
+                const target = event.target;
+                const isTableInput = target.closest('td') !== null;
+
+                if (isTableInput) {
+                    openZoomInput(target);
+                    return;
+                }
+            }
+
+            if (!isVoiceEnabled) return;
+            currentFocusedElement = event.target;
+            lastProcessedIndex = 0; // Reset index for new field
+
+            try {
+                recognition.start();
+            } catch (e) {
+                // Recognition already started
+                console.log('Recognition already active');
+            }
+        }
+
+        function handleInputBlur(event) {
+            // Don't stop recognition on blur, keep it running for next field
+        }
+
+        function openZoomInput(inputElement) {
+            originalInputElement = inputElement;
+            const zoomOverlay = document.getElementById('zoomOverlay');
+            const zoomInput = document.getElementById('zoomInput');
+            const zoomTitle = document.getElementById('zoomTitle');
+
+            // Get the column header name
+            const td = inputElement.closest('td');
+            const columnIndex = Array.from(td.parentElement.children).indexOf(td);
+            const headerRow = td.closest('table').querySelector('thead tr');
+            const headerCell = headerRow.children[columnIndex];
+            const columnName = headerCell ? headerCell.textContent.trim() : 'Enter Text';
+
+            // Set title and value
+            zoomTitle.textContent = columnName;
+            zoomInput.value = inputElement.value;
+
+            // Show overlay
+            zoomOverlay.classList.add('active');
+
+            // Focus on zoom input
+            setTimeout(() => {
+                zoomInput.focus();
+
+                // Set up voice typing for zoom input if enabled
+                if (isVoiceEnabled) {
+                    currentFocusedElement = zoomInput;
+                    lastProcessedIndex = 0;
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.log('Recognition already active');
+                    }
+                }
+            }, 100);
+        }
+
+        function closeZoomInput() {
+            const zoomOverlay = document.getElementById('zoomOverlay');
+            const zoomInput = document.getElementById('zoomInput');
+
+            // Copy value back to original input
+            if (originalInputElement) {
+                originalInputElement.value = zoomInput.value;
+            }
+
+            // Hide overlay
+            zoomOverlay.classList.remove('active');
+
+            // Clear zoom input
+            zoomInput.value = '';
+            originalInputElement = null;
+
+            // Reset voice typing reference
+            if (isVoiceEnabled) {
+                currentFocusedElement = null;
+            }
+        }
+
+        // ===== Draft Save/Upload Functionality =====
+
+        function saveDraft() {
+            // Collect all form data
+            const formData = {
+                formDate: document.getElementById('formDate').value,
+                formTime: document.getElementById('formTime').value,
+                formPlace: document.getElementById('formPlace').value,
+                baMachineNo: document.getElementById('baMachineNo').value,
+                cliName: document.getElementById('cliName').value,
+                otherRemarks: document.getElementById('otherRemarks').value,
+                tableData: []
+            };
+
+            // Collect table data
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row) => {
+                const cells = row.querySelectorAll('input, textarea');
+                const rowData = {
+                    name: cells[0].value || '',
+                    crewId: cells[1].value || '',
+                    designation: cells[2].value || '',
+                    id: cells[3].value || '',
+                    recordNo: cells[4].value || '',
+                    time: cells[5].value || '',
+                    baTestResult: cells[6].value || ''
+                };
+                formData.tableData.push(rowData);
+            });
+
+            // Convert to JSON and download
+            const dataStr = JSON.stringify(formData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Create filename with timestamp
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            link.download = `BA_Test_Draft_${timestamp}.json`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showMessage('Draft saved successfully! File downloaded.', 'success');
+        }
+
+        function triggerUploadDraft() {
+            // Trigger the hidden file input
+            document.getElementById('draftFileInput').click();
+        }
+
+        function uploadDraft(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Check if it's a JSON file
+            if (!file.name.endsWith('.json')) {
+                showMessage('Please upload a valid JSON draft file.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const draftData = JSON.parse(e.target.result);
+
+                    // Populate form fields
+                    document.getElementById('formDate').value = draftData.formDate || '';
+                    document.getElementById('formTime').value = draftData.formTime || '';
+                    document.getElementById('formPlace').value = draftData.formPlace || '';
+                    document.getElementById('baMachineNo').value = draftData.baMachineNo || '';
+                    document.getElementById('cliName').value = draftData.cliName || '';
+                    document.getElementById('otherRemarks').value = draftData.otherRemarks || '';
+
+                    // Clear existing table rows
+                    const tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = '';
+
+                    // Populate table data
+                    if (draftData.tableData && draftData.tableData.length > 0) {
+                        draftData.tableData.forEach((rowData, index) => {
+                            const newRow = document.createElement('tr');
+                            newRow.innerHTML = `
+                                <td class="row-number">${index + 1}</td>
+                                <td><input type="text" value="${rowData.name || ''}"></td>
+                                <td><input type="text" value="${rowData.crewId || ''}"></td>
+                                <td><input type="text" value="${rowData.designation || ''}"></td>
+                                <td><input type="text" value="${rowData.id || ''}"></td>
+                                <td><input type="text" value="${rowData.recordNo || ''}"></td>
+                                <td><input type="text" value="${rowData.time || ''}"></td>
+                                <td><textarea rows="2">${rowData.baTestResult || ''}</textarea></td>
+                            `;
+                            tableBody.appendChild(newRow);
+                        });
+                        rowCount = draftData.tableData.length;
+                    } else {
+                        // If no table data, create default 10 rows
+                        for (let i = 1; i <= 10; i++) {
+                            const newRow = document.createElement('tr');
+                            newRow.innerHTML = `
+                                <td class="row-number">${i}</td>
+                                <td><input type="text"></td>
+                                <td><input type="text"></td>
+                                <td><input type="text"></td>
+                                <td><input type="text"></td>
+                                <td><input type="text"></td>
+                                <td><input type="text"></td>
+                                <td><textarea rows="2"></textarea></td>
+                            `;
+                            tableBody.appendChild(newRow);
+                        }
+                        rowCount = 10;
+                    }
+
+                    showMessage('Draft uploaded successfully! You can now edit and submit.', 'success');
+                } catch (error) {
+                    console.error('Error parsing draft file:', error);
+                    showMessage('Error loading draft file. Please check the file format.', 'error');
+                }
+            };
+
+            reader.onerror = function() {
+                showMessage('Error reading file. Please try again.', 'error');
+            };
+
+            reader.readAsText(file);
+
+            // Reset the file input so the same file can be uploaded again
+            event.target.value = '';
+        }
+
+        // Mobile View Toggle Function
+        function toggleMobileView() {
+            const toggle = document.getElementById('mobileToggle');
+            if (toggle.checked) {
+                document.body.classList.add('mobile-view');
+                showMessage('Mobile view enabled! Page optimized for mobile screens.', 'success');
+            } else {
+                document.body.classList.remove('mobile-view');
+                showMessage('Desktop view restored.', 'success');
+            }
+        }
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
