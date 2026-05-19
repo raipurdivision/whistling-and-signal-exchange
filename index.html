@@ -24,6 +24,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1400,19 +1401,16 @@
                 doc.setFontSize(9);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(0, 0, 0);
-                doc.text('CLI 2:', 14, sigY);
-                doc.setTextColor(0, 0, 0);
                 if (sig2Data) {
-                    doc.text('Signature:', 14, sigY + 6);
-                    doc.addImage(sig2Data, imgFmt(sig2Data), 14, sigY + 8, 40, 15);
+                    doc.addImage(sig2Data, imgFmt(sig2Data), 14, sigY, 40, 15);
                     if (cli2Name) {
                         doc.setFont(undefined, 'bold');
-                        doc.text(cli2Name, 14, sigY + 27);
+                        doc.text(cli2Name, 14, sigY + 19);
                     }
                 } else {
                     if (cli2Name) {
                         doc.setFont(undefined, 'bold');
-                        doc.text(cli2Name, 14, sigY + 8);
+                        doc.text(cli2Name, 14, sigY + 4);
                     }
                 }
 
@@ -1420,19 +1418,16 @@
                 doc.setFontSize(9);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(0, 0, 0);
-                doc.text('CLI 1:', pgWidth - 14, sigY, { align: 'right' });
-                doc.setTextColor(0, 0, 0);
                 if (sig1Data) {
-                    doc.text('Signature:', pgWidth - 54, sigY + 6);
-                    doc.addImage(sig1Data, imgFmt(sig1Data), pgWidth - 54, sigY + 8, 40, 15);
+                    doc.addImage(sig1Data, imgFmt(sig1Data), pgWidth - 54, sigY, 40, 15);
                     if (cli1Name) {
                         doc.setFont(undefined, 'bold');
-                        doc.text(cli1Name, pgWidth - 14, sigY + 27, { align: 'right' });
+                        doc.text(cli1Name, pgWidth - 14, sigY + 19, { align: 'right' });
                     }
                 } else {
                     if (cli1Name) {
                         doc.setFont(undefined, 'bold');
-                        doc.text(cli1Name, pgWidth - 14, sigY + 8, { align: 'right' });
+                        doc.text(cli1Name, pgWidth - 14, sigY + 4, { align: 'right' });
                     }
                 }
 
