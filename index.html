@@ -22,6 +22,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1153,10 +1155,23 @@
                 }
             });
 
+            // Convert date from yyyy-mm-dd to dd/mm/yy
+            let formattedDate = '';
+            if (formDate) {
+                const parts = formDate.split('-'); // [yyyy, mm, dd]
+                if (parts.length === 3) {
+                    const yy = parts[0].slice(-2); // last 2 digits of year
+                    formattedDate = parts[2] + '/' + parts[1] + '/' + yy;
+                } else {
+                    formattedDate = formDate;
+                }
+            }
+
             // Build URL-encoded payload
-            // Sheet columns: Timestamp | CLI Name & HQ | CLI Name-2 & HQ | Time | Place | Signal Exchange | Whistling | Remarks | Other Remarks
+            // Sheet columns: Timestamp | Date | CLI Name & HQ | CLI Name-2 & HQ | Time | Place | Signal Exchange | Whistling | Remarks | Other Remarks
             const params = new URLSearchParams({
                 sheet:          'Whistling & Signal Exchange',
+                date:           formattedDate,
                 cliName:        cliName1Val,
                 cliName2:       cliName2Val,
                 time:           formTime,
@@ -1165,7 +1180,6 @@
                 whistling:      whistling,
                 remarks:        tableRemarks,
                 otherRemarks:   (conductedBy ? 'Conducted By: ' + conductedBy + (otherRemarks ? ' | ' + otherRemarks : '') : otherRemarks)
-                                + (formDate ? ' | Date: ' + formDate : '')
             });
 
             showMessage('\u23f3 Submitting data to Google Sheets...', 'success');
