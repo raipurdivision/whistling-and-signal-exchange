@@ -187,16 +187,16 @@
             box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
         }
 
+        /* DATE | TIME | PLACE | CONDUCTED BY  → all in one row */
         .info-fields {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1.6fr);
+            gap: 12px;
             margin-bottom: 15px;
-            flex-wrap: wrap;
         }
 
         .info-field {
-            flex: 0 1 350px;
+            min-width: 0;
         }
 
         .info-field label {
@@ -492,13 +492,16 @@
 
             .form-container { padding: 14px 12px; }
 
-            /* date / time / place / conducted by  → 2 per row */
+            /* date / time / place / conducted by  → all 4 in one row */
             .info-fields {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
+                grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1.5fr);
+                gap: 5px;
             }
             .info-field { flex: none; min-width: 0; }
+            .info-field input[type="text"] {
+                font-size: 12px;
+                padding: 8px 3px;
+            }
 
             /* 16px inputs stop iOS from zooming on focus */
             input[type="text"],
@@ -510,14 +513,13 @@
                 font-size: 16px;
                 padding: 10px 8px;
             }
-            .info-field input,
             .remarks-section textarea,
             .cli-field select,
             .cli-field input[type="text"],
             .cli-field input[type="file"] { font-size: 16px; }
             .cli-field select { padding: 10px 6px; }
 
-            .info-field label,
+            .info-field label { font-size: 9px; white-space: nowrap; letter-spacing: -0.2px; }
             .remarks-section label { font-size: 13px; }
 
             /* table: swipe sideways, S/No. column stays pinned */
@@ -589,7 +591,9 @@
         }
 
         @media (max-width: 380px) {
-            .info-fields { grid-template-columns: 1fr; }
+            .info-fields { gap: 3px; }
+            .info-field label { font-size: 8px; }
+            .info-field input[type="text"] { font-size: 11px; padding: 8px 2px; }
             .header h1 { font-size: 0.9em; }
             .button-group.action-row .action-btn { font-size: 8px; max-height: 40px; padding: 3px 1px 2px; }
             .button-group.action-row .btn-ico { font-size: 1.05em; }
@@ -906,9 +910,9 @@
                     </div>
                 </div>
                 <div class="cli-field">
-                    <label for="cliName2">2nd CLI Name and HQ:</label>
+                    <label for="cliName2">CLI Name and HQ:</label>
                     <select id="cliName2" onchange="toggleOthers('cliName2','cliName2Other')">
-                        <option value="">Select 2nd CLI Name and HQ (optional)</option>
+                        <option value="">Select CLI Name and HQ</option>
                         <option value="A K REDDY/CLI/R">A K REDDY/CLI/R</option>
                         <option value="A.R. TARAM/CLI/BIA">A.R. TARAM/CLI/BIA</option>
                         <option value="ABDUL MOIN KHAN/CLI/BIA">ABDUL MOIN KHAN/CLI/BIA</option>
@@ -1010,7 +1014,7 @@
                     </div>
                 </div>
                 <div class="cli-field">
-                    <label for="signature2">Upload 2nd Signature:</label>
+                    <label for="signature2">Upload Signature:</label>
                     <input type="file" id="signature2" accept="image/*" onchange="previewSignatureById('signature2','signaturePreview2','signatureImg2')">
                     <div id="signaturePreview2" style="margin-top:8px; display:none;">
                         <img id="signatureImg2" style="max-width:180px;max-height:80px;border:2px solid #4a90e2;border-radius:5px;">
@@ -1206,8 +1210,8 @@
                 showMessage('\u26a0\ufe0f Please enter the Date!', 'error');
                 return;
             }
-            if (!cliName1Val) {
-                showMessage('\u26a0\ufe0f Please select CLI 1 Name!', 'error');
+            if (!cliName1Val && !cliName2Val) {
+                showMessage('\u26a0\ufe0f Please select CLI Name!', 'error');
                 return;
             }
 
@@ -1409,47 +1413,68 @@
                 ]);
             });
 
-            // Generate table
-            doc.autoTable({
-                head: [['S.No.', 'Loco NO', 'Train No.', 'Direction', 'Time', 'Signal Exchanged', 'Whistling', 'Remarks']],
-                body: tableData,
-                startY: 58,
-                theme: 'grid',
-                headStyles: {
-                    fillColor: [74, 144, 226],
-                    textColor: [0, 0, 0],
-                    fontStyle: 'bold',
-                    halign: 'center',
-                    fontSize: 9,
-                    cellPadding: 2.5,
-                    minCellHeight: 9
-                },
-                styles: {
-                    fontSize: 9,
-                    cellPadding: 2,
-                    halign: 'center',
-                    minCellHeight: 8,
-                    overflow: 'linebreak',
-                    textColor: [0, 0, 0]
-                },
-                columnStyles: {
-                    0: { cellWidth: 9 },
-                    1: { cellWidth: 28 },
-                    2: { cellWidth: 22 },
-                    3: { cellWidth: 18 },
-                    4: { cellWidth: 18 },
-                    5: { cellWidth: 20 },
-                    6: { cellWidth: 18 },
-                    7: { cellWidth: 48 }
-                },
-                alternateRowStyles: {
-                    fillColor: [240, 248, 255]
-                },
-                pageBreak: 'avoid'
-            });
+            // Page 1 holds up to 20 rows (+ remarks & signatures when 20 or fewer).
+            // Above 20 rows: rows 21+ , Other Remarks and CLI names/signatures go to page 2.
+            const pageHeight  = doc.internal.pageSize.getHeight();
+            const MAX_ROWS_P1 = 20;
+            const tableStartY = 58;
+            const tableHead   = [['S.No.', 'Loco NO', 'Train No.', 'Direction', 'Time', 'Signal Exchanged', 'Whistling', 'Remarks']];
+
+            function drawTable(body, startY) {
+                doc.autoTable({
+                    head: tableHead,
+                    body: body,
+                    startY: startY,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [74, 144, 226],
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        halign: 'center',
+                        fontSize: 9,
+                        cellPadding: 2.5,
+                        minCellHeight: 9
+                    },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2,
+                        halign: 'center',
+                        minCellHeight: 8,
+                        overflow: 'linebreak',
+                        textColor: [0, 0, 0]
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 9 },
+                        1: { cellWidth: 28 },
+                        2: { cellWidth: 22 },
+                        3: { cellWidth: 18 },
+                        4: { cellWidth: 18 },
+                        5: { cellWidth: 20 },
+                        6: { cellWidth: 18 },
+                        7: { cellWidth: 48 }
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 248, 255]
+                    },
+                    pageBreak: 'auto'
+                });
+            }
+
+            if (tableData.length <= MAX_ROWS_P1) {
+                drawTable(tableData, tableStartY);
+            } else {
+                drawTable(tableData.slice(0, MAX_ROWS_P1), tableStartY);
+                doc.addPage();
+                drawTable(tableData.slice(MAX_ROWS_P1), 20);
+            }
 
             // Get the Y position after the table
-            let yPosition = doc.lastAutoTable.finalY + 10;
+            let yPosition = doc.lastAutoTable.finalY + 8;
+            // If remarks + signatures won't fit on this page, move them to a new page
+            if (yPosition + 45 > pageHeight - 8) {
+                doc.addPage();
+                yPosition = 20;
+            }
 
             // Get Other Remarks
             const otherRemarks = document.getElementById('otherRemarks').value || '';
@@ -1460,7 +1485,7 @@
             doc.text('Other Remarks if any:', 14, yPosition);
 
             // Draw outlined box for Other Remarks
-            const boxHeight = 15;
+            const boxHeight = 10;
             const boxWidth = 180;
             doc.setDrawColor(255, 255, 255);
             doc.setLineWidth(0.5);
@@ -1473,9 +1498,9 @@
                 doc.text(splitOtherRemarks, 18, yPosition + 7);
             }
 
-            yPosition += boxHeight + 18;
+            yPosition += boxHeight + 10;
 
-            // Get CLI 1 (right) and CLI 2 (left) names
+            // Get CLI 1 (left) and CLI 2 (right) names
             const cli1Name = getCLIName('cliName1', 'cliName1OtherText');
             const cli2Name = getCLIName('cliName2', 'cliName2OtherText');
 
@@ -1518,38 +1543,24 @@
                 const pgWidth = doc.internal.pageSize.getWidth();
                 const sigY = yPosition;
 
-                // ── CLI 2 block (LEFT side) ──
                 doc.setFontSize(9);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(0, 0, 0);
-                if (sig2Data) {
-                    doc.addImage(sig2Data, imgFmt(sig2Data), 14, sigY, 40, 15);
-                    if (cli2Name) {
-                        doc.setFont(undefined, 'bold');
-                        doc.text(cli2Name, 14, sigY + 19);
-                    }
-                } else {
-                    if (cli2Name) {
-                        doc.setFont(undefined, 'bold');
-                        doc.text(cli2Name, 14, sigY + 4);
-                    }
+
+                // ── CLI 1 block (LEFT side) ──
+                if (sig1Data) {
+                    doc.addImage(sig1Data, imgFmt(sig1Data), 14, sigY, 40, 15);
+                    if (cli1Name) doc.text(cli1Name, 14, sigY + 19);
+                } else if (cli1Name) {
+                    doc.text(cli1Name, 14, sigY + 4);
                 }
 
-                // ── CLI 1 block (RIGHT side) ──
-                doc.setFontSize(9);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(0, 0, 0);
-                if (sig1Data) {
-                    doc.addImage(sig1Data, imgFmt(sig1Data), pgWidth - 54, sigY, 40, 15);
-                    if (cli1Name) {
-                        doc.setFont(undefined, 'bold');
-                        doc.text(cli1Name, pgWidth - 14, sigY + 19, { align: 'right' });
-                    }
-                } else {
-                    if (cli1Name) {
-                        doc.setFont(undefined, 'bold');
-                        doc.text(cli1Name, pgWidth - 14, sigY + 4, { align: 'right' });
-                    }
+                // ── CLI 2 block (RIGHT side) ──
+                if (sig2Data) {
+                    doc.addImage(sig2Data, imgFmt(sig2Data), pgWidth - 54, sigY, 40, 15);
+                    if (cli2Name) doc.text(cli2Name, pgWidth - 14, sigY + 19, { align: 'right' });
+                } else if (cli2Name) {
+                    doc.text(cli2Name, pgWidth - 14, sigY + 4, { align: 'right' });
                 }
 
                 // Save PDF (mobile-friendly: build a Blob and download via a temporary link,
