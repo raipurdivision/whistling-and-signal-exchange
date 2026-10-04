@@ -598,6 +598,23 @@
             .button-group.action-row .action-btn { font-size: 8px; max-height: 40px; padding: 3px 1px 2px; }
             .button-group.action-row .btn-ico { font-size: 1.05em; }
         }
+
+        /* ── extra mobile polish ── */
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100%; }
+            img { max-width: 100%; height: auto; }
+            button, .action-btn, .add-row-btn, select { min-height: 44px; touch-action: manipulation; }
+            table button { min-width: 36px; min-height: 36px; }
+            .table-wrapper { max-width: 100%; }
+            .cli-field input[type="file"] { width: 100%; }
+            #signaturePreview1 img, #signaturePreview2 img { max-width: 100%; height: auto; }
+            .saving-card { width: calc(100% - 32px); max-width: 340px; padding: 20px 16px; }
+        }
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header { padding: 6px 14px; }
+            .header-logo { width: 40px; height: 40px; }
+            .cli-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
     </style>
 <!-- Code injected by Five-server -->
   <script async data-id="five-server" data-file="c:\Users\asus\OneDrive\Desktop\ALL FORMS\mobile ambush\index.html" type="application/javascript" src="/fiveserver.js"></script>
@@ -799,9 +816,9 @@
             <!-- CLI Name / Signature / 2nd CLI Name / 2nd Signature -->
             <div class="cli-row">
                 <div class="cli-field">
-                    <label for="cliName1">CLI Name and HQ:</label>
+                    <label for="cliName1">CLI-2 Name and HQ:</label>
                     <select id="cliName1" onchange="toggleOthers('cliName1','cliName1Other')">
-                        <option value="">Select CLI Name and HQ</option>
+                        <option value="">Select CLI-2 Name and HQ</option>
                         <option value="A K REDDY/CLI/R">A K REDDY/CLI/R</option>
                         <option value="A.R. TARAM/CLI/BIA">A.R. TARAM/CLI/BIA</option>
                         <option value="ABDUL MOIN KHAN/CLI/BIA">ABDUL MOIN KHAN/CLI/BIA</option>
@@ -898,8 +915,8 @@
                         <option value="OTHERS">OTHERS</option>
                     </select>
                     <div id="cliName1Other" class="cli-other" style="display:none;">
-                        <label>Enter CLI Name Manually:</label>
-                        <input type="text" id="cliName1OtherText" placeholder="Type CLI name here...">
+                        <label>Enter CLI-2 Name Manually:</label>
+                        <input type="text" id="cliName1OtherText" placeholder="Type CLI-2 name here...">
                     </div>
                 </div>
                 <div class="cli-field">
@@ -910,9 +927,9 @@
                     </div>
                 </div>
                 <div class="cli-field">
-                    <label for="cliName2">CLI Name and HQ:</label>
+                    <label for="cliName2">CLI-1 Name and HQ:</label>
                     <select id="cliName2" onchange="toggleOthers('cliName2','cliName2Other')">
-                        <option value="">Select CLI Name and HQ</option>
+                        <option value="">Select CLI-1 Name and HQ</option>
                         <option value="A K REDDY/CLI/R">A K REDDY/CLI/R</option>
                         <option value="A.R. TARAM/CLI/BIA">A.R. TARAM/CLI/BIA</option>
                         <option value="ABDUL MOIN KHAN/CLI/BIA">ABDUL MOIN KHAN/CLI/BIA</option>
@@ -1009,8 +1026,8 @@
                         <option value="OTHERS">OTHERS</option>
                     </select>
                     <div id="cliName2Other" class="cli-other" style="display:none;">
-                        <label>Enter 2nd CLI Name Manually:</label>
-                        <input type="text" id="cliName2OtherText" placeholder="Type 2nd CLI name here...">
+                        <label>Enter CLI-1 Name Manually:</label>
+                        <input type="text" id="cliName2OtherText" placeholder="Type CLI-1 name here...">
                     </div>
                 </div>
                 <div class="cli-field">
@@ -1211,7 +1228,7 @@
                 return;
             }
             if (!cliName1Val && !cliName2Val) {
-                showMessage('\u26a0\ufe0f Please select CLI Name!', 'error');
+                showMessage('\u26a0\ufe0f Please select CLI-1 or CLI-2 Name!', 'error');
                 return;
             }
 
