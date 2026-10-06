@@ -615,6 +615,22 @@
             .header-logo { width: 40px; height: 40px; }
             .cli-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
+    
+        /* ── MOBILE FIXES: overlay + PDF download dialog ── */
+        .saving-card { max-height: 90vh; overflow-y: auto; }
+        @media (max-width: 600px) {
+            .saving-card { padding: 28px 20px 24px; width: 100%; max-width: 340px; }
+            .saving-ring { width: 88px; height: 88px; margin-bottom: 20px; }
+            .saving-title { font-size: 18px; }
+        }
+        .pdf-dl-overlay { position: fixed; inset: 0; z-index: 100000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,20,30,0.7); }
+        .pdf-dl-overlay.active { display: flex; }
+        .pdf-dl-card { background:#fff; border-radius:20px; padding:28px 22px; text-align:center; width:100%; max-width:340px; box-shadow:0 20px 60px rgba(0,0,0,.45); }
+        .pdf-dl-card h3 { margin:0 0 6px; color:#16a34a; font-size:20px; }
+        .pdf-dl-card p { margin:0 0 18px; color:#444; font-size:14px; }
+        .pdf-dl-card a, .pdf-dl-card button { display:block; width:100%; box-sizing:border-box; padding:14px; margin-top:10px; border-radius:12px; border:0; font-size:16px; font-weight:700; text-decoration:none; cursor:pointer; }
+        .pdf-dl-card a { background:#16a34a; color:#fff; }
+        .pdf-dl-card button { background:#eee; color:#333; }
     </style>
 <!-- Code injected by Five-server -->
   <script async data-id="five-server" data-file="c:\Users\asus\OneDrive\Desktop\ALL FORMS\mobile ambush\index.html" type="application/javascript" src="/fiveserver.js"></script>
@@ -630,8 +646,17 @@
                 </svg>
                 <div class="saving-hand">✋</div>
             </div>
-            <div class="saving-title">⏳ Please wait — data saving...</div>
+            <div class="saving-title">⏳ SAVING DATA… please wait</div>
             <div class="saving-sub">Do not close or refresh this page</div>
+        </div>
+    </div>
+    <div class="pdf-dl-overlay" id="pdfDlOverlay">
+        <div class="pdf-dl-card">
+            <h3>📄 PDF ready</h3>
+            <p>If the download did not start, tap the button below.</p>
+            <a id="pdfDlLink" href="#" download>⬇️ Download PDF</a>
+            <button type="button" id="pdfShareBtn" style="display:none">📤 Share / Save PDF</button>
+            <button type="button" onclick="closePdfDialog()">Close</button>
         </div>
     </div>
     <div class="container">
@@ -1585,30 +1610,51 @@
                 const timestamp = new Date().toISOString().split('T')[0];
                 const fileName = `WHISTLING AND SIGNAL EXCHANGE_${timestamp}.pdf`;
                 savePdfBlob(doc, fileName);
-                showMessage('PDF generated and downloaded successfully!', 'success');
+                showMessage('PDF generated successfully!', 'success');
             }
         }
 
+        let pdfBlobUrl = null;
+        function closePdfDialog() {
+            document.getElementById('pdfDlOverlay').classList.remove('active');
+        }
+
         function savePdfBlob(doc, fileName) {
+            const blob = doc.output('blob');
+            if (pdfBlobUrl) { try { URL.revokeObjectURL(pdfBlobUrl); } catch (e) {} }
+            pdfBlobUrl = URL.createObjectURL(blob);
+
+            // Always show a dialog with a real tap-able link: mobile browsers (esp. iOS Safari
+            // and in-app browsers) block downloads started after async work, but allow a direct tap.
+            const link = document.getElementById('pdfDlLink');
+            link.href = pdfBlobUrl;
+            link.setAttribute('download', fileName);
+            link.onclick = function() { setTimeout(closePdfDialog, 800); };
+
+            const shareBtn = document.getElementById('pdfShareBtn');
+            let file = null;
+            try { file = new File([blob], fileName, { type: 'application/pdf' }); } catch (e) {}
+            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                shareBtn.style.display = 'block';
+                shareBtn.onclick = function() {
+                    navigator.share({ files: [file], title: fileName }).catch(function() {});
+                };
+            } else {
+                shareBtn.style.display = 'none';
+            }
+            document.getElementById('pdfDlOverlay').classList.add('active');
+
+            // Best-effort automatic download (works on desktop / Android Chrome)
             try {
-                const blob = doc.output('blob');
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                const a = document.createElement('a');
+                a.href = pdfBlobUrl;
+                a.download = fileName;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             } catch (err) {
-                console.error('Blob download failed, falling back:', err);
-                // Fallback: some mobile in-app browsers block the download attribute.
-                // Open the PDF in the same tab so the user can save it manually.
-                try {
-                    doc.save(fileName);
-                } catch (err2) {
-                    window.open(doc.output('bloburl'), '_blank');
-                }
+                console.error('Auto download failed:', err);
             }
         }
 
